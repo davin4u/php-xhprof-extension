@@ -95,14 +95,69 @@ PHP_FUNCTION(tideways_xhprof_disable)
 
     array_init(return_value);
 
+    send_agent_msg();
+
     tracing_callgraph_append_to_array(return_value TSRMLS_CC);
+}
+
+void send_agent_msg()
+{
+    int fd;
+	struct sockaddr_un addr;
+	int ret;
+	char buff[8192];
+	struct sockaddr_un from;
+	int ok = 1;
+	int len;
+
+    if ((fd = socket(PF_UNIX, SOCK_DGRAM, 0)) < 0) {
+		ok = 0;
+	}
+
+    if (ok) {
+		memset(&addr, 0, sizeof(addr));
+		addr.sun_family = AF_UNIX;
+		strcpy(addr.sun_path, CLIENT_SOCK_FILE);
+		unlink(CLIENT_SOCK_FILE);
+		if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+			ok = 0;
+		}
+	}
+
+    if (ok) {
+		memset(&addr, 0, sizeof(addr));
+		addr.sun_family = AF_UNIX;
+		strcpy(addr.sun_path, SERVER_SOCK_FILE);
+		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+			ok = 0;
+		}
+	}
+
+    if (ok) {
+		strcpy (buff, "Hello from php extension");
+		if (send(fd, buff, strlen(buff)+1, 0) == -1) {
+			ok = 0;
+		}
+	}
+
+    if (ok) {
+		if ((len = recv(fd, buff, 8192, 0)) < 0) {
+			ok = 0;
+		}
+	}
+
+	if (fd >= 0) {
+		close(fd);
+	}
+
+	unlink (CLIENT_SOCK_FILE);
 }
 
 PHP_GINIT_FUNCTION(tideways_xhprof)
 {
 #if defined(COMPILE_DL_TIDEWAYS_XHPROF) && defined(ZTS)
      ZEND_TSRMLS_CACHE_UPDATE();
-#endif 
+#endif
      tideways_xhprof_globals->root = NULL;
      tideways_xhprof_globals->callgraph_frames = NULL;
      tideways_xhprof_globals->frame_free_list = NULL;

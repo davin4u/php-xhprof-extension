@@ -1,4 +1,7 @@
 #ifndef PHP_TIDEWAYS_XHPROF_H
+#define CLIENT_SOCK_FILE "client.sock"
+#define SERVER_SOCK_FILE "agent.sock"
+
 #define PHP_TIDEWAYS_XHPROF_H
 
 extern zend_module_entry tideways_xhprof_module_entry;
@@ -104,4 +107,3 @@ ZEND_TSRMLS_CACHE_EXTERN()
 #endif
 
 #endif	/* PHP_TIDEWAYS_XHPROF_H */
-
