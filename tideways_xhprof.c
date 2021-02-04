@@ -8,6 +8,9 @@
 #include "ext/standard/info.h"
 #include "php_tideways_xhprof.h"
 
+#include <sys/socket.h>
+#include <sys/un.h>
+
 ZEND_DECLARE_MODULE_GLOBALS(tideways_xhprof)
 
 #include "tracing.h"
