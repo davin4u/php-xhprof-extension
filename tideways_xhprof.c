@@ -10,6 +10,8 @@
 
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 ZEND_DECLARE_MODULE_GLOBALS(tideways_xhprof)
 
@@ -80,6 +82,24 @@ void tideways_xhprof_execute_ex (zend_execute_data *execute_data) {
 }
 #endif
 
+void savelog (char data[5]) {
+    FILE * fPtr;
+
+    fPtr = fopen("/tmp/log.txt", "a");
+
+    if(fPtr == NULL)
+    {
+        /* File not created hence exit */
+        printf("Unable to create file.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fputs(data, fPtr);
+    fputs("\n", fPtr);
+
+    fclose(fPtr);
+}
+
 PHP_FUNCTION(tideways_xhprof_enable)
 {
     zend_long flags = 0;
@@ -113,9 +133,13 @@ void send_agent_msg()
 	int ok = 1;
 	int len;
 
+    savelog("s1");
+
     if ((fd = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
 		ok = 0;
 	}
+
+    savelog("s2");
 
     if (ok) {
 		memset(&addr, 0, sizeof(addr));
@@ -127,6 +151,8 @@ void send_agent_msg()
 		}
 	}
 
+    savelog("s3");
+
     if (ok) {
 		memset(&addr, 0, sizeof(addr));
 		addr.sun_family = AF_UNIX;
@@ -136,12 +162,16 @@ void send_agent_msg()
 		}
 	}
 
+    savelog("s4");
+
     if (ok) {
 		strcpy (buff, "HelloAgent");
 		if (send(fd, buff, strlen(buff)+1, 0) == -1) {
 			ok = 0;
 		}
 	}
+
+    savelog("s5");
 
     if (ok) {
 		if ((len = recv(fd, buff, 8192, 0)) < 0) {
