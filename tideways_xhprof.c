@@ -142,6 +142,8 @@ void send_agent_msg()
     savelog("s2");
 
     if (ok) {
+        savelog("s2ok");
+
 		memset(&addr, 0, sizeof(addr));
 		addr.sun_family = AF_UNIX;
 		strcpy(addr.sun_path, CLIENT_SOCK_FILE);
@@ -154,17 +156,20 @@ void send_agent_msg()
     savelog("s3");
 
     if (ok) {
+        savelog("s3ok");
 		memset(&addr, 0, sizeof(addr));
 		addr.sun_family = AF_UNIX;
 		strcpy(addr.sun_path, SERVER_SOCK_FILE);
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
-			ok = 0;
+            savelog("s3er");
+            ok = 0;
 		}
 	}
 
     savelog("s4");
 
     if (ok) {
+        savelog("s4ok");
 		strcpy (buff, "HelloAgent");
 		if (send(fd, buff, strlen(buff)+1, 0) == -1) {
 			ok = 0;
@@ -174,6 +179,7 @@ void send_agent_msg()
     savelog("s5");
 
     if (ok) {
+        savelog("s5ok");
 		if ((len = recv(fd, buff, 8192, 0)) < 0) {
 			ok = 0;
 		}
