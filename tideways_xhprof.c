@@ -12,6 +12,7 @@
 #include <sys/un.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 ZEND_DECLARE_MODULE_GLOBALS(tideways_xhprof)
 
@@ -132,6 +133,8 @@ void send_agent_msg()
 	struct sockaddr_un from;
 	int ok = 1;
 	int len;
+    char err[10];
+    char errtext[100];
 
     savelog("s1");
 
@@ -161,7 +164,9 @@ void send_agent_msg()
 		addr.sun_family = AF_UNIX;
 		strcpy(addr.sun_path, SERVER_SOCK_FILE);
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
-            savelog("s3er");
+            sprintf(err,"%ld", errno);
+            savelog(err);
+            savelog(strerror(errno));
             ok = 0;
 		}
 	}
