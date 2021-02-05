@@ -113,7 +113,7 @@ void send_agent_msg()
 	int ok = 1;
 	int len;
 
-    if ((fd = socket(PF_UNIX, SOCK_DGRAM, 0)) < 0) {
+    if ((fd = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
 		ok = 0;
 	}
 
@@ -137,7 +137,7 @@ void send_agent_msg()
 	}
 
     if (ok) {
-		strcpy (buff, "Hello from php extension");
+		strcpy (buff, "HelloAgent");
 		if (send(fd, buff, strlen(buff)+1, 0) == -1) {
 			ok = 0;
 		}
