@@ -13,6 +13,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "php_string.h"
+#include "php_var.h"
+#include "zend_smart_str.h"
+#include "basic_functions.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(tideways_xhprof)
 
@@ -119,12 +123,76 @@ PHP_FUNCTION(tideways_xhprof_disable)
 
     array_init(return_value);
 
-    send_agent_msg();
-
     tracing_callgraph_append_to_array(return_value TSRMLS_CC);
+
+    send_agent_msg(return_value);
 }
 
-void send_agent_msg()
+void format_tracing_data(zval *struc, char[] *formated, int *index)
+{
+    HashTable *myht;
+    zend_ulong num;
+	zend_string *key;
+	zval *val;
+
+    switch (Z_TYPE_P(struc)) {
+        case IS_LONG:
+            append_format_long(formated, index, Z_LVAL_P(struc));
+
+            break;
+
+        case IS_ARRAY:
+			myht = Z_ARRVAL_P(struc);
+
+			ZEND_HASH_FOREACH_KEY_VAL(myht, num, key, val) {
+				format_array_element(formated, index, val, num, key);
+			} ZEND_HASH_FOREACH_END();
+
+			break;
+    }
+}
+
+void format_array_element(char[] *formated, int *index, zval *zv, zend_ulong index, zend_string *key)
+{
+	if (key == NULL) { /* numeric key */
+
+	} else { /* string key */
+        append_format_string(formated, index, ZSTR_VAL(key));
+	}
+
+	format_tracing_data(zv, formated);
+}
+
+void append_format_long(char[] *formated, int *index, long v)
+{
+    union {
+        char myByte[512];
+        long mylong;
+    } vu;
+
+    vu.mylong = v;
+
+    if (index + strlen(vu.myByte) < 8192) {
+        int i;
+        for (i = 0; i < strlen(vu.myByte); i++) {
+            formated[index] = vu.myByte[i];
+            index++;
+        }
+    }
+}
+
+void append_format_string(char[] *formated, int *index, char[] str)
+{
+    if (index + strlen(str) < 8192) {
+        int i;
+        for (i = 0; i < strlen(str); i++) {
+            formated[index] = str[i];
+            index++;
+        }
+    }
+}
+
+void send_agent_msg(zval *struc)
 {
     int fd;
 	struct sockaddr_un addr;
@@ -135,6 +203,10 @@ void send_agent_msg()
 	int len;
     char err[10];
     char errtext[100];
+    char formated[8192];
+    int index = 0;
+
+    format_tracing_data(struc, formated, index);
 
     savelog("s1");
 
@@ -175,7 +247,7 @@ void send_agent_msg()
 
     if (ok) {
         savelog("s4ok");
-		strcpy (buff, "HelloAgent");
+		strcpy(buff, formated);
 		if (send(fd, buff, strlen(buff)+1, 0) == -1) {
 			ok = 0;
 		}
