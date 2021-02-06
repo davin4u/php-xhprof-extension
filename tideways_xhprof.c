@@ -13,10 +13,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+/*
 #include "php_string.h"
 #include "php_var.h"
 #include "zend_smart_str.h"
-#include "basic_functions.h"
+#include "basic_functions.h"*/
 
 ZEND_DECLARE_MODULE_GLOBALS(tideways_xhprof)
 
@@ -87,7 +88,7 @@ void tideways_xhprof_execute_ex (zend_execute_data *execute_data) {
 }
 #endif
 
-void savelog (char data[5]) {
+void savelog (char data[25000]) {
     FILE * fPtr;
 
     fPtr = fopen("/tmp/log.txt", "a");
@@ -128,6 +129,7 @@ PHP_FUNCTION(tideways_xhprof_disable)
     send_agent_msg(return_value);
 }
 
+/*
 void format_tracing_data(zval *struc, char[] *formated, int *index)
 {
     HashTable *myht;
@@ -154,9 +156,9 @@ void format_tracing_data(zval *struc, char[] *formated, int *index)
 
 void format_array_element(char[] *formated, int *index, zval *zv, zend_ulong index, zend_string *key)
 {
-	if (key == NULL) { /* numeric key */
+	if (key == NULL) {
 
-	} else { /* string key */
+	} else {
         append_format_string(formated, index, ZSTR_VAL(key));
 	}
 
@@ -191,6 +193,7 @@ void append_format_string(char[] *formated, int *index, char[] str)
         }
     }
 }
+*/
 
 void send_agent_msg(zval *struc)
 {
@@ -203,10 +206,20 @@ void send_agent_msg(zval *struc)
 	int len;
     char err[10];
     char errtext[100];
-    char formated[8192];
-    int index = 0;
 
-    format_tracing_data(struc, formated, index);
+    php_json_encoder encoder;
+	smart_str buf = {0};
+
+    php_json_encode_init(&encoder);
+	encoder.max_depth = 10;
+
+    php_json_encode_zval(&buf, struc, 0, &encoder);
+
+    smart_str_0(&buf);
+
+    if (buf.s) {
+        savelog(buf.s);
+    }
 
     savelog("s1");
 
