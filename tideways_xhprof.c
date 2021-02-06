@@ -20,10 +20,10 @@
 #include "basic_functions.h"*/
 
 #include "zend_smart_str.h"
-#include "php_json.h"
-#include "php_json_encoder.h"
-#include "php_json_parser.h"
-#include "json_arginfo.h"
+#include "ext/json/php_json.h"
+#include "ext/json/php_json_encoder.h"
+#include "ext/json/php_json_parser.h"
+#include "ext/json/json_arginfo.h"
 
 ZEND_DECLARE_MODULE_GLOBALS(tideways_xhprof)
 
