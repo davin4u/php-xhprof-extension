@@ -6,24 +6,27 @@
 #include "php_ini.h"
 #include "SAPI.h"
 #include "ext/standard/info.h"
-#include "php_tideways_xhprof.h"
 
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-/*
-#include "php_string.h"
-#include "php_var.h"
-#include "zend_smart_str.h"
-#include "basic_functions.h"*/
 
 #include "zend_smart_str.h"
 #include "ext/json/php_json.h"
 #include "ext/json/php_json_encoder.h"
 #include "ext/json/php_json_parser.h"
 #include "ext/json/json_arginfo.h"
+
+#include "php_tideways_xhprof.h"
+
+
+/*
+#include "php_string.h"
+#include "php_var.h"
+#include "zend_smart_str.h"
+#include "basic_functions.h"*/
 
 ZEND_DECLARE_MODULE_GLOBALS(tideways_xhprof)
 
