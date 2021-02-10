@@ -220,21 +220,15 @@ void send_agent_msg(zval *struc)
     char err[10];
     char errtext[100];
 
-    //php_json_encoder encoder;
+
 	smart_str buf = {0};
-
     php_json_encode(&buf, struc, 0);
-
-    /*
-    php_json_encode_init(&encoder);
-	encoder.max_depth = 10;
-
-    php_json_encode_zval(&buf, struc, 0, &encoder);*/
-
     smart_str_0(&buf);
-
     if (buf.s) {
         savelog(ZSTR_VAL(buf.s));
+    }
+    else {
+        ok = 0;
     }
 
     savelog("s1");
@@ -276,8 +270,9 @@ void send_agent_msg(zval *struc)
 
     if (ok) {
         savelog("s4ok");
-		strcpy(buff, "Hello");
-		if (send(fd, buff, strlen(buff)+1, 0) == -1) {
+		//strcpy(buff, "Hello");
+		//if (send(fd, buff, strlen(buff)+1, 0) == -1) {
+        if (send(fd, ZSTR_VAL(buf.s), ZSTR_LEN(buf.s)+1, 0) == -1) {
 			ok = 0;
 		}
 	}
