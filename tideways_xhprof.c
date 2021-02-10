@@ -15,12 +15,14 @@
 
 #include "zend_smart_str.h"
 #include "ext/json/php_json.h"
-#include "ext/json/php_json_encoder.h"
-#include "ext/json/php_json_parser.h"
-#include "ext/json/json_arginfo.h"
 
 #include "php_tideways_xhprof.h"
 
+/*
+#include "ext/json/php_json_encoder.h"
+#include "ext/json/php_json_parser.h"
+#include "ext/json/json_arginfo.h"
+*/
 
 /*
 #include "php_string.h"
@@ -40,6 +42,8 @@ ZEND_DECLARE_MODULE_GLOBALS(tideways_xhprof)
 PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("tideways_xhprof.clock_use_rdtsc", "0", PHP_INI_SYSTEM, OnUpdateBool, clock_use_rdtsc, zend_tideways_xhprof_globals, tideways_xhprof_globals)
 PHP_INI_END()
+
+void send_agent_msg(zval *struc);
 
 static void (*_zend_execute_internal) (zend_execute_data *execute_data, zval *return_value);
 ZEND_DLEXPORT void tideways_xhprof_execute_internal(zend_execute_data *execute_data, zval *return_value);
@@ -216,18 +220,21 @@ void send_agent_msg(zval *struc)
     char err[10];
     char errtext[100];
 
-    php_json_encoder encoder;
+    //php_json_encoder encoder;
 	smart_str buf = {0};
 
+    php_json_encode(&buf, struc, 0);
+
+    /*
     php_json_encode_init(&encoder);
 	encoder.max_depth = 10;
 
-    php_json_encode_zval(&buf, struc, 0, &encoder);
+    php_json_encode_zval(&buf, struc, 0, &encoder);*/
 
     smart_str_0(&buf);
 
     if (buf.s) {
-        savelog(buf.s);
+        savelog(ZSTR_VAL(buf.s));
     }
 
     savelog("s1");
@@ -269,7 +276,7 @@ void send_agent_msg(zval *struc)
 
     if (ok) {
         savelog("s4ok");
-		strcpy(buff, formated);
+		strcpy(buff, "Hello");
 		if (send(fd, buff, strlen(buff)+1, 0) == -1) {
 			ok = 0;
 		}

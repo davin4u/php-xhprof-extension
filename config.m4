@@ -74,6 +74,11 @@ if test "$PHP_TIDEWAYS_XHPROF" != "no"; then
 
     PHP_ARG_ENABLE(developer-flags, whether to enable developer build flags,
         [  --enable-developer-flags   Enable developer flags],, no)
+    
+    ifdef([PHP_ADD_EXTENSION_DEP],
+    [
+      PHP_ADD_EXTENSION_DEP(tideways_xhprof, json, true)
+    ])
 
     if test "$PHP_DEVELOPER_FLAGS" = "yes"; then
         dnl Warn about functions which might be candidates for format attributes
