@@ -43,6 +43,7 @@ PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("tideways_xhprof.clock_use_rdtsc", "0", PHP_INI_SYSTEM, OnUpdateBool, clock_use_rdtsc, zend_tideways_xhprof_globals, tideways_xhprof_globals)
 PHP_INI_END()
 
+void savelog (char data[25000]);
 void send_agent_msg(zval *struc);
 
 static void (*_zend_execute_internal) (zend_execute_data *execute_data, zval *return_value);
@@ -52,6 +53,7 @@ ZEND_DLEXPORT void tideways_xhprof_execute_internal(zend_execute_data *execute_d
 #include "zend_observer.h"
 
 static void tracer_observer_begin(zend_execute_data *ex) {
+    savelog("here?");
     if (!TXRG(enabled)) {
         return;
     }
@@ -87,10 +89,14 @@ void tideways_xhprof_execute_ex (zend_execute_data *execute_data) {
     int is_profiling = 0;
 
     if (!TXRG(enabled)) {
+        savelog("profiling not enable yet");
+
         zend_long flags = 0;
 
         tracing_begin(flags TSRMLS_CC);
+        savelog("step1");
         tracing_enter_root_frame(TSRMLS_C);
+        savelog("step2");
 
         //_zend_execute_ex(execute_data TSRMLS_CC);
         //return;
