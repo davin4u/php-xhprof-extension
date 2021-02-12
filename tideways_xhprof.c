@@ -87,8 +87,13 @@ void tideways_xhprof_execute_ex (zend_execute_data *execute_data) {
     int is_profiling = 0;
 
     if (!TXRG(enabled)) {
-        _zend_execute_ex(execute_data TSRMLS_CC);
-        return;
+        zend_long flags = 0;
+
+        tracing_begin(flags TSRMLS_CC);
+        tracing_enter_root_frame(TSRMLS_C);
+
+        //_zend_execute_ex(execute_data TSRMLS_CC);
+        //return;
     }
 
     is_profiling = tracing_enter_frame_callgraph(NULL, real_execute_data TSRMLS_CC);
