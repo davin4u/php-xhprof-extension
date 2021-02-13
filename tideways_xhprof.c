@@ -89,17 +89,8 @@ void tideways_xhprof_execute_ex (zend_execute_data *execute_data) {
     int is_profiling = 0;
 
     if (!TXRG(enabled)) {
-        savelog("profiling not enable yet");
-
-        zend_long flags = 0;
-
-        tracing_begin(flags TSRMLS_CC);
-        savelog("step1");
-        tracing_enter_root_frame(TSRMLS_C);
-        savelog("step2");
-
-        //_zend_execute_ex(execute_data TSRMLS_CC);
-        //return;
+        _zend_execute_ex(execute_data TSRMLS_CC);
+        return;
     }
 
     is_profiling = tracing_enter_frame_callgraph(NULL, real_execute_data TSRMLS_CC);
@@ -351,6 +342,15 @@ PHP_RINIT_FUNCTION(tideways_xhprof)
 
     CG(compiler_options) = CG(compiler_options) | ZEND_COMPILE_NO_BUILTINS;
 
+    savelog("RQUEST INIT");
+
+    zend_long flags = 0;
+
+    tracing_begin(flags TSRMLS_CC);
+    tracing_enter_root_frame(TSRMLS_C);
+
+    savelog("XHPROF ENABLED");
+
     return SUCCESS;
 }
 
@@ -360,6 +360,15 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
     xhprof_callgraph_bucket *bucket;
 
     tracing_end(TSRMLS_C);
+
+    /* take callgraph and send it to the agent */
+    savelog("REQUEST SHUTDOWN");
+    array_init(return_value);
+
+    tracing_callgraph_append_to_array(return_value TSRMLS_CC);
+
+    send_agent_msg(return_value);
+    /******************************************/
 
     for (i = 0; i < TIDEWAYS_XHPROF_CALLGRAPH_SLOTS; i++) {
         bucket = TXRG(callgraph_buckets)[i];
