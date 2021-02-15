@@ -342,14 +342,16 @@ PHP_RINIT_FUNCTION(tideways_xhprof)
 
     CG(compiler_options) = CG(compiler_options) | ZEND_COMPILE_NO_BUILTINS;
 
-    savelog("RQUEST INIT");
+    if (!TXRG(enabled)) {
+        savelog("RQUEST INIT");
 
-    zend_long flags = 0;
+        zend_long flags = 0;
 
-    tracing_begin(flags TSRMLS_CC);
-    tracing_enter_root_frame(TSRMLS_C);
+        tracing_begin(flags TSRMLS_CC);
+        tracing_enter_root_frame(TSRMLS_C);
 
-    savelog("XHPROF ENABLED");
+        savelog("XHPROF ENABLED");
+    }
 
     return SUCCESS;
 }
