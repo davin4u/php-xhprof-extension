@@ -361,8 +361,9 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
 {
     int i = 0;
     xhprof_callgraph_bucket *bucket;
-    zval *cg;
 
+    zval *cg;
+    MAKE_STD_ZVAL(cg);
     array_init(cg);
 
     tracing_end(TSRMLS_C);
