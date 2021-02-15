@@ -222,6 +222,7 @@ void send_agent_msg(zval *struc)
     char err[10];
     char errtext[100];
 
+    savelog("send_agent_msg");
 
 	smart_str buf = {0};
     php_json_encode(&buf, struc, 0);
