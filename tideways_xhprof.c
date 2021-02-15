@@ -363,6 +363,8 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
     xhprof_callgraph_bucket *bucket;
     zval *cg;
 
+    array_init(cg);
+
     tracing_end(TSRMLS_C);
 
     /* take callgraph and send it to the agent */
