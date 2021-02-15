@@ -361,16 +361,20 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
 {
     int i = 0;
     xhprof_callgraph_bucket *bucket;
-    zval *return_value;
+    zval *cg;
 
     tracing_end(TSRMLS_C);
 
     /* take callgraph and send it to the agent */
     savelog("REQUEST SHUTDOWN");
 
-    tracing_callgraph_append_to_array(return_value TSRMLS_CC);
+    tracing_callgraph_append_to_array(cg TSRMLS_CC);
 
-    send_agent_msg(return_value);
+    savelog("after append to array");
+
+    send_agent_msg(cg);
+
+    savelog("after send msg to agent");
     /******************************************/
 
     for (i = 0; i < TIDEWAYS_XHPROF_CALLGRAPH_SLOTS; i++) {
