@@ -225,15 +225,9 @@ void send_agent_msg(zval *struc)
 
     savelog("send_agent_msg");
 
-    remote_addr = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), "REMOTE_ADDR", HASH_KEY_SIZEOF("REMOTE_ADDR"));
-
-    sprintf(err,"err1: %d", errno);
-    savelog(err);
+    remote_addr = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), "REMOTE_ADDR", sizeof("REMOTE_ADDR") - 1);
 
     savelog(Z_STRVAL_P(remote_addr));
-
-    sprintf(err,"err2: %d", errno);
-    savelog(err);
 
 	smart_str buf = {0};
     php_json_encode(&buf, struc, 0);
