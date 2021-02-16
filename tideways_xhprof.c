@@ -262,7 +262,7 @@ void send_agent_msg(zval *struc)
 		addr.sun_family = AF_UNIX;
 		strcpy(addr.sun_path, SERVER_SOCK_FILE);
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
-            sprintf(err,"%ld", errno);
+            sprintf(err,"%d", errno);
             savelog(err);
             savelog(strerror(errno));
             ok = 0;
@@ -362,16 +362,16 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
     int i = 0;
     xhprof_callgraph_bucket *bucket;
 
-    zval *cg;
-    MAKE_STD_ZVAL(cg);
-    array_init(cg);
+    zval cg;
+    //MAKE_STD_ZVAL(cg);
+    array_init(&cg);
 
     tracing_end(TSRMLS_C);
 
     /* take callgraph and send it to the agent */
     savelog("REQUEST SHUTDOWN");
 
-    tracing_callgraph_append_to_array(cg TSRMLS_CC);
+    tracing_callgraph_append_to_array(&cg TSRMLS_CC);
 
     savelog("after append to array");
 
