@@ -227,7 +227,7 @@ void send_agent_msg(zval *struc)
 
     remote_addr = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), "REMOTE_ADDR", HASH_KEY_SIZEOF("REMOTE_ADDR"));
 
-    savelog(ZSTR_VAL(remote_addr));
+    savelog(Z_STRVAL_P(remote_addr));
 
 	smart_str buf = {0};
     php_json_encode(&buf, struc, 0);
