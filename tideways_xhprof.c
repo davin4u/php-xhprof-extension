@@ -375,7 +375,7 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
 
     savelog("after append to array");
 
-    send_agent_msg(cg);
+    send_agent_msg(&cg);
 
     savelog("after send msg to agent");
     /******************************************/
