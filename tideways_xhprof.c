@@ -221,8 +221,13 @@ void send_agent_msg(zval *struc)
 	int len;
     char err[10];
     char errtext[100];
+    zval *remote_addr = NULL;
 
     savelog("send_agent_msg");
+
+    remote_addr = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), "REMOTE_ADDR", HASH_KEY_SIZEOF("REMOTE_ADDR"));
+
+    savelog(ZSTR_VAL(remote_addr));
 
 	smart_str buf = {0};
     php_json_encode(&buf, struc, 0);
@@ -363,7 +368,6 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
     xhprof_callgraph_bucket *bucket;
 
     zval cg;
-    //MAKE_STD_ZVAL(cg);
     array_init(&cg);
 
     tracing_end(TSRMLS_C);
