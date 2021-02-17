@@ -351,13 +351,9 @@ PHP_RINIT_FUNCTION(tideways_xhprof)
     if (!TXRG(enabled)) {
         savelog("RQUEST INIT");
 
-        zval *ztget;
+        if (zend_hash_str_find(Z_ARR(PG(http_globals)[TRACK_VARS_GET]), "ZTRACE", sizeof("ZTRACE") - 1)) {
+            savelog("ZTRACE exists");
 
-        ztget = zend_hash_str_find(Z_ARR(PG(http_globals)[TRACK_VARS_GET]), "ZTRACE", sizeof("ZTRACE") - 1);
-
-        savelog(Z_STRVAL_P(ztget));
-
-        if (zend_hash_str_find(Z_ARR(PG(http_globals)[TRACK_VARS_GET]), "ZTRACE", sizeof("ZTRACE") - 1) != NULL) {
             zend_long flags = 0;
 
             tracing_begin(flags TSRMLS_CC);
