@@ -351,12 +351,14 @@ PHP_RINIT_FUNCTION(tideways_xhprof)
     if (!TXRG(enabled)) {
         savelog("RQUEST INIT");
 
-        zend_long flags = 0;
+        if (zend_hash_str_find(Z_ARR(PG(http_globals)[TRACK_VARS_GET]), "ZTRACE", sizeof("ZTRACE") - 1) != NULL) {
+            zend_long flags = 0;
 
-        tracing_begin(flags TSRMLS_CC);
-        tracing_enter_root_frame(TSRMLS_C);
+            tracing_begin(flags TSRMLS_CC);
+            tracing_enter_root_frame(TSRMLS_C);
 
-        savelog("XHPROF ENABLED");
+            savelog("XHPROF ENABLED");
+        }
     }
 
     return SUCCESS;
@@ -367,21 +369,23 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
     int i = 0;
     xhprof_callgraph_bucket *bucket;
 
-    zval cg;
-    array_init(&cg);
-
     tracing_end(TSRMLS_C);
 
     /* take callgraph and send it to the agent */
     savelog("REQUEST SHUTDOWN");
 
-    tracing_callgraph_append_to_array(&cg TSRMLS_CC);
+    if (TXRG(enabled)) {
+        zval cg;
+        array_init(&cg);
 
-    savelog("after append to array");
+        tracing_callgraph_append_to_array(&cg TSRMLS_CC);
 
-    send_agent_msg(&cg);
+        savelog("after append to array");
 
-    savelog("after send msg to agent");
+        send_agent_msg(&cg);
+
+        savelog("after send msg to agent");
+    }
     /******************************************/
 
     for (i = 0; i < TIDEWAYS_XHPROF_CALLGRAPH_SLOTS; i++) {
