@@ -371,12 +371,12 @@ PHP_RSHUTDOWN_FUNCTION(tideways_xhprof)
     int i = 0;
     xhprof_callgraph_bucket *bucket;
 
-    tracing_end(TSRMLS_C);
-
     /* take callgraph and send it to the agent */
     savelog("REQUEST SHUTDOWN");
 
-    if (TXRG(enabled)) {
+    if (TXRG(enabled) == 1) {
+        tracing_end(TSRMLS_C);
+
         zval cg;
         array_init(&cg);
 
